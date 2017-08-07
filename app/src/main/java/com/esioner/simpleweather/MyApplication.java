@@ -13,7 +13,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
-        LitePalApplication.getContext();
+        LitePalApplication.initialize(context);
     }
 
     //获取全局上下文
