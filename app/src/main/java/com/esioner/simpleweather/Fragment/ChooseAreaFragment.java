@@ -74,7 +74,7 @@ public class ChooseAreaFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -126,40 +126,43 @@ public class ChooseAreaFragment extends Fragment {
         backButton.setVisibility(View.VISIBLE);
         cityList = DataSupport.where("provinceId = ?", String.valueOf(selectProvince.getId()))
                 .find(City.class);
-        if(cityList.size()>0){
+        if (cityList.size() > 0) {
             dataList.clear();
-            for (City city:cityList){
+            for (City city : cityList) {
                 dataList.add(city.getCityName());
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
             currentLevel = LEVEL_CITY;
-        }else {
+        } else {
             int provinceCode = selectProvince.getProvinceCode();
-            String address = "http://guolin.tech/api/china/"+provinceCode;
-            queryFromServer(address,"city");
+            String address = "http://guolin.tech/api/china/" + provinceCode;
+            queryFromServer(address, "city");
         }
     }
+
     //查询县
     private void queryCountries() {
         titleText.setText(selectCity.getCityName());
         backButton.setVisibility(View.VISIBLE);
-        countryList = DataSupport.where("cityId = ?",String.valueOf(selectCity.getId())).find(Country.class);
-        if (countryList.size()>0){
+        countryList = DataSupport.where("cityId = ?", String.valueOf(selectCity.getId())).find
+                (Country.class);
+        if (countryList.size() > 0) {
             dataList.clear();
-            for (Country country:countryList){
+            for (Country country : countryList) {
                 dataList.add(country.getCountryName());
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
             currentLevel = LEVEL_COUNTRY;
-        }else {
+        } else {
             int provinceCode = selectProvince.getProvinceCode();
             int cityCode = selectCity.getCiteCode();
-            String address = "http://guolin.tech/api/china/"+provinceCode+"/"+cityCode;
-            queryFromServer(address,"country");
+            String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
+            queryFromServer(address, "country");
         }
     }
+
     //根据传入的地址类型从服务器上查询数据
     private void queryFromServer(String address, final String type) {
         showProgressDialog();
@@ -171,31 +174,32 @@ public class ChooseAreaFragment extends Fragment {
                     @Override
                     public void run() {
                         closeProgressDialog();
-                        Toast.makeText(getContext(),"加载失败",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "加载失败", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
+
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseText = response.body().string();
                 boolean result = false;
-                if ("province".equals(type)){
+                if ("province".equals(type)) {
                     result = Utility.handleProvinceResponse(responseText);
-                }else if("cities".equals(type)){
-                    result = Utility.handleCityResponse(responseText,selectProvince.getId());
-                }else if("country".equals(type)){
-                    result = Utility.handleCountryResponse(responseText,selectCity.getId());
+                } else if ("cities".equals(type)) {
+                    result = Utility.handleCityResponse(responseText, selectProvince.getId());
+                } else if ("country".equals(type)) {
+                    result = Utility.handleCountryResponse(responseText, selectCity.getId());
                 }
-                if (result){
+                if (result) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             closeProgressDialog();
-                            if ("province".equals(type)){
+                            if ("province".equals(type)) {
                                 queryProvinces();
-                            }else if ("cities".equals(type)){
+                            } else if ("cities".equals(type)) {
                                 queryCities();
-                            }else if ("country".equals(type)){
+                            } else if ("country".equals(type)) {
                                 queryCountries();
                             }
                         }
@@ -204,9 +208,10 @@ public class ChooseAreaFragment extends Fragment {
             }
         });
     }
+
     //显示进度对话框
     private void showProgressDialog() {
-        if (progressDialog == null){
+        if (progressDialog == null) {
             progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("正在加载。。。");
             progressDialog.setCancelable(false);
@@ -215,7 +220,7 @@ public class ChooseAreaFragment extends Fragment {
     }
 
     private void closeProgressDialog() {
-        if (progressDialog!=null){
+        if (progressDialog != null) {
             progressDialog.dismiss();
         }
     }
