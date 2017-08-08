@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,8 @@ import okhttp3.Response;
 
 public class ChooseAreaFragment extends Fragment {
 
+    public static String TAG = "ChooseAreaFragment";
+
     public static final int LEVEL_PROVINCE = 0;
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_COUNTRY = 2;
@@ -44,17 +47,29 @@ public class ChooseAreaFragment extends Fragment {
     private ArrayAdapter<String> adapter;
 
     private List<String> dataList = new ArrayList();
-    //省列表
+    /**
+     * 省列表
+     */
     private List<Province> provinceList;
-    //市列表
+    /**
+     * 市列表
+     */
     private List<City> cityList;
-    //县列表
+    /*
+     * 县列表
+     */
     private List<Country> countryList;
-    //选中的省份
+    /*
+     * 选中的省份
+     */
     private Province selectProvince;
-    //选中的城市
+    /**
+     * 选中的城市
+     */
     private City selectCity;
-    //当前选中的级别
+    /**
+     * 当前选中的级别
+     */
     private int currentLevel;
 
     private ProgressDialog progressDialog;
@@ -137,6 +152,9 @@ public class ChooseAreaFragment extends Fragment {
         } else {
             int provinceCode = selectProvince.getProvinceCode();
             String address = "http://guolin.tech/api/china/" + provinceCode;
+
+            Log.d(TAG, "queryCities: " + address);
+
             queryFromServer(address, "city");
         }
     }
@@ -185,7 +203,7 @@ public class ChooseAreaFragment extends Fragment {
                 boolean result = false;
                 if ("province".equals(type)) {
                     result = Utility.handleProvinceResponse(responseText);
-                } else if ("cities".equals(type)) {
+                } else if ("city".equals(type)) {
                     result = Utility.handleCityResponse(responseText, selectProvince.getId());
                 } else if ("country".equals(type)) {
                     result = Utility.handleCountryResponse(responseText, selectCity.getId());
@@ -197,7 +215,7 @@ public class ChooseAreaFragment extends Fragment {
                             closeProgressDialog();
                             if ("province".equals(type)) {
                                 queryProvinces();
-                            } else if ("cities".equals(type)) {
+                            } else if ("city".equals(type)) {
                                 queryCities();
                             } else if ("country".equals(type)) {
                                 queryCountries();
@@ -218,7 +236,7 @@ public class ChooseAreaFragment extends Fragment {
         }
         progressDialog.show();
     }
-
+    //关闭进度对话框
     private void closeProgressDialog() {
         if (progressDialog != null) {
             progressDialog.dismiss();
