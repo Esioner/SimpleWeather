@@ -83,8 +83,9 @@ public class WeatherActivity extends Activity {
      * 根据天气id 请求城市天气信息
      */
     public void requestWeather(String weatherId) {
-        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId +
-                "&key=277b1ba9658c44d3af30c860e9942878";
+//        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId +
+//                "&key=277b1ba9658c44d3af30c860e9942878";
+        String weatherUrl = "https://free-api.heweather.com/v5/weather?city="+weatherId+"&key=277b1ba9658c44d3af30c860e9942878";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -150,9 +151,9 @@ public class WeatherActivity extends Activity {
             aqiText.setText(weather.aqi.city.aqi);
             pmText.setText(weather.aqi.city.pm25);
         }
-        String comfort = "舒适度" + weather.suggestion.comfort.info;
-        String carWash = "洗车指数"+ weather.suggestion.carWash.info;
-        String sport = "运动建议"+ weather.suggestion.sport.info;
+        String comfort = "舒适度:\n" + weather.suggestion.comfort.info;
+        String carWash = "洗车指数:\n"+ weather.suggestion.carWash.info;
+        String sport = "运动建议:\n"+ weather.suggestion.sport.info;
         comfortText.setText(comfort);
         carWashText.setText(carWash);
         sportText.setText(sport);
