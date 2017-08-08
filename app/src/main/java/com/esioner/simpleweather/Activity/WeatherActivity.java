@@ -6,7 +6,13 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,7 +37,7 @@ import okhttp3.Response;
  * Create: 2017/8/8
  */
 
-public class WeatherActivity extends Activity {
+public class WeatherActivity extends AppCompatActivity {
 
     private ScrollView weatherLayout;
     private TextView titleCity;
@@ -44,8 +50,10 @@ public class WeatherActivity extends Activity {
     private TextView comfortText;
     private TextView carWashText;
     private TextView sportText;
-    private String weatherId;
+    public String weatherId;
     private ImageView bingPicImg;
+    public SwipeRefreshLayout swipeRefresh;
+    public DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +83,17 @@ public class WeatherActivity extends Activity {
         carWashText = (TextView) findViewById(R.id.car_wash_text);
         sportText = (TextView) findViewById(R.id.sport_text);
         bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
+        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        drawerLayout.openDrawer(Gravity.LEFT);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowTitleEnabled(true);
+        }
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-
         String bingPic = sp.getString("bing_pic", null);
         if (bingPic != null) {
             Glide.with(this).load(bingPic).into(bingPicImg);
@@ -89,6 +105,7 @@ public class WeatherActivity extends Activity {
         if (weatherString != null) {
             //有缓存的时候直接解析天气数据
             Weather weather = Utility.handleWeatherResponse(weatherString);
+            weatherId = weather.basic.weatherId;
             showWeatherInfo(weather);
         } else {
             //无缓存的时候去服务器查询天气
@@ -96,7 +113,12 @@ public class WeatherActivity extends Activity {
             weatherLayout.setVisibility(View.VISIBLE);
             requestWeather(weatherId);
         }
-
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestWeather(weatherId);
+            }
+        });
 
     }
 
@@ -141,6 +163,7 @@ public class WeatherActivity extends Activity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -162,6 +185,7 @@ public class WeatherActivity extends Activity {
                             Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT)
                                     .show();
                         }
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -208,5 +232,15 @@ public class WeatherActivity extends Activity {
         carWashText.setText(carWash);
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                drawerLayout.openDrawer(Gravity.LEFT);
+                break;
+        }
+        return true;
     }
 }

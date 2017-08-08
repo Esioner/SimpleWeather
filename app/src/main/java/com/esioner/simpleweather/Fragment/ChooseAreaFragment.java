@@ -17,10 +17,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esioner.simpleweather.Activity.WeatherActivity;
+import com.esioner.simpleweather.MainActivity;
 import com.esioner.simpleweather.R;
 import com.esioner.simpleweather.db.City;
 import com.esioner.simpleweather.db.Country;
 import com.esioner.simpleweather.db.Province;
+import com.esioner.simpleweather.gson.Weather;
 import com.esioner.simpleweather.util.HttpUtil;
 import com.esioner.simpleweather.util.Utility;
 
@@ -104,10 +106,19 @@ public class ChooseAreaFragment extends Fragment {
                     queryCountries();
                 }else if (currentLevel == LEVEL_COUNTRY){
                     String weatherId = countryList.get(position).getWeatherId();
-                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
-                    intent.putExtra("weather_id",weatherId);
-                    startActivity(intent);
-                    getActivity().finish();
+                    if (getActivity() instanceof MainActivity){
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("weather_id",weatherId);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }else if (getActivity() instanceof WeatherActivity){
+                        WeatherActivity activity = (WeatherActivity) getActivity();
+                        activity.weatherId = weatherId;
+                        activity.drawerLayout.closeDrawers();
+                        activity.swipeRefresh.setRefreshing(true);
+                        activity.requestWeather(weatherId);
+                    }
+
                 }
             }
         });
