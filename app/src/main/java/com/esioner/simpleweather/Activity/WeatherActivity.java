@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,9 +51,11 @@ public class WeatherActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= 21){
+        if (Build.VERSION.SDK_INT >= 21) {
             View decorView = getWindow().getDecorView();
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         setContentView(R.layout.weather_activity_layout);
@@ -77,11 +78,10 @@ public class WeatherActivity extends Activity {
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String bingPic = sp.getString("bing_pic",null);
-        if(bingPic != null){
+        String bingPic = sp.getString("bing_pic", null);
+        if (bingPic != null) {
             Glide.with(this).load(bingPic).into(bingPicImg);
-        }else
-        {
+        } else {
             loadBingPic();
         }
 
@@ -99,6 +99,7 @@ public class WeatherActivity extends Activity {
 
 
     }
+
     //从服务器获取 Bing 背景图片
     private void loadBingPic() {
         String requestBingPic = "http://guolin.tech/api/bing_pic";
@@ -111,8 +112,9 @@ public class WeatherActivity extends Activity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String bingPic = response.body().string();
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
-                editor.putString("bing_pic",bingPic);
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences
+                        (WeatherActivity.this).edit();
+                editor.putString("bing_pic", bingPic);
                 editor.apply();
                 runOnUiThread(new Runnable() {
                     @Override
@@ -130,7 +132,8 @@ public class WeatherActivity extends Activity {
     public void requestWeather(String weatherId) {
 //        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId +
 //                "&key=277b1ba9658c44d3af30c860e9942878";
-        String weatherUrl = "https://free-api.heweather.com/v5/weather?city="+weatherId+"&key=277b1ba9658c44d3af30c860e9942878";
+        String weatherUrl = "https://free-api.heweather.com/v5/weather?city=" + weatherId +
+                "&key=277b1ba9658c44d3af30c860e9942878";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -181,8 +184,9 @@ public class WeatherActivity extends Activity {
         degreeText.setText(degree);
         weatherInfoText.setText(weatherInfo);
         forecastLayout.removeAllViews();
-        for (Forecast forecast:weather.forecastList){
-            View view = LayoutInflater.from(WeatherActivity.this).inflate(R.layout.forecast_item,forecastLayout,false);
+        for (Forecast forecast : weather.forecastList) {
+            View view = LayoutInflater.from(WeatherActivity.this).inflate(R.layout.forecast_item,
+                    forecastLayout, false);
             TextView dateText = (TextView) view.findViewById(R.id.date_text);
             TextView infoText = (TextView) view.findViewById(R.id.info_text);
             TextView maxText = (TextView) view.findViewById(R.id.max_text);
@@ -193,13 +197,13 @@ public class WeatherActivity extends Activity {
             minText.setText(forecast.temperature.min);
             forecastLayout.addView(view);
         }
-        if (weather.aqi != null){
+        if (weather.aqi != null) {
             aqiText.setText(weather.aqi.city.aqi);
             pmText.setText(weather.aqi.city.pm25);
         }
-        String comfort = "舒适度:\n" + weather.suggestion.comfort.info;
-        String carWash = "洗车指数:\n"+ weather.suggestion.carWash.info;
-        String sport = "运动建议:\n"+ weather.suggestion.sport.info;
+        String comfort = "舒适度:\n\n" + weather.suggestion.comfort.info;
+        String carWash = "洗车指数:\n\n" + weather.suggestion.carWash.info;
+        String sport = "运动建议:\n\n" + weather.suggestion.sport.info;
         comfortText.setText(comfort);
         carWashText.setText(carWash);
         sportText.setText(sport);
